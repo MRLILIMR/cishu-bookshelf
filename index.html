@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#faf7f0">
+<title>词城一夜 · One Night in Lexicon City</title>
+<style>
+:root{
+  --paper:#faf7f0; --paper2:#f3eee2; --ink:#2c2620; --muted:#847a6d; --line:#e6ddcc;
+  --card:#fffdf8; --accent:#a8611f; --accent-soft:#f0dcb4; --wtx:#C62828; --wsbg:#fbf4e4; --hl:#e9c884; --mark:#ded2b8; --sec:#8F3A30;
+  --shadow:0 10px 30px rgba(60,44,20,.13); --shadow-s:0 2px 10px rgba(60,44,20,.07);
+  --serif:Georgia,"Times New Roman","Songti SC","Source Han Serif SC","Noto Serif SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  --fs:19px;
+}
+html[data-theme="night"]{
+  --paper:#131820; --paper2:#0e131a; --ink:#dde3ea; --muted:#8b96a5; --line:#243040;
+  --card:#1a212b; --accent:#e0a45f; --accent-soft:#3a2c1a; --wtx:#D4AF37; --wsbg:#2a2318; --hl:#5b4418; --mark:#2d3947; --sec:#CF8762;
+  --shadow:0 12px 34px rgba(0,0,0,.5); --shadow-s:0 2px 12px rgba(0,0,0,.35);
+}
+html[data-theme="sepia"]{
+  --paper:#f2e8d3; --paper2:#eadfc6; --ink:#3b3123; --muted:#8a7a60; --line:#dccdaf;
+  --card:#fbf3e2; --accent:#8f5a1d; --accent-soft:#e6d3ac; --wtx:#D84315; --wsbg:#f0e3c9; --hl:#d9b46b; --mark:#d3c3a2; --sec:#9A4526;
+  --shadow:0 10px 30px rgba(90,66,30,.16); --shadow-s:0 2px 10px rgba(90,66,30,.09);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:var(--fs);line-height:1.75;transition:background .25s,color .25s;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+}
+button{font-family:var(--sans);color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--accent)}
+
+.boot{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+  background:var(--paper);color:var(--muted);font-family:var(--sans);font-size:15px;letter-spacing:.04em;
+  transition:opacity .25s}
+body.ready .boot{opacity:0;pointer-events:none}
+.boot .err{color:var(--wtx);max-width:80%;text-align:center;line-height:1.8}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:10px;
+  padding:calc(6px + env(safe-area-inset-top)) 14px 6px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line);
+}
+.icon-btn{
+  min-width:44px;height:44px;display:grid;place-items:center;border-radius:12px;
+  font-size:15px;letter-spacing:.02em;color:var(--muted);
+}
+.icon-btn:active{background:var(--paper2)}
+.crumb{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;justify-content:center}
+.crumb b{font-family:var(--serif);font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb span{font-size:12px;color:var(--muted);letter-spacing:.08em}
+#bar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:60;transition:width .1s linear}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;display:flex;gap:48px;padding:0 18px}
+.reader{flex:1;min-width:0;max-width:36rem;margin:0 auto;padding:18px 0 40px}
+.side{display:none}
+
+.hero{margin:0 -18px 0;position:relative;overflow:hidden;background:var(--paper2)}
+.hero img{display:block;width:100%;height:auto;aspect-ratio:var(--hr,3/2);object-fit:cover}
+.hero:after{content:"";position:absolute;inset:auto 0 0 0;height:40%;
+  background:linear-gradient(to top,var(--paper),transparent)}
+.chhead{padding:6px 0 4px}
+.chmeta{font-size:12px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.chhead h1{font-family:var(--serif);font-weight:600;font-size:1.62em;line-height:1.28;margin:.24em 0 .1em}
+.chhead .cn{font-size:.86em;color:var(--muted);margin:0 0 6px;font-family:var(--serif)}
+
+/* ---------- paragraphs ---------- */
+.chbody{margin-top:10px}
+.para{position:relative;margin:0 0 1.05em}
+.para .en{font-family:var(--serif);font-size:1em;line-height:1.78;letter-spacing:.005em;margin:0;text-indent:var(--ind,1.5em)}
+.para .zh{
+  font-size:.86em;line-height:1.75;color:var(--muted);margin:.55em 0 0;padding-left:.9em;
+  border-left:2px solid var(--line);display:none;
+}
+.para.open .zh{display:block}
+.zhbtn{
+  display:block;margin:3px 0 0 auto;width:44px;height:26px;border-radius:8px;
+  font-size:11px;color:var(--muted);opacity:.5;
+}
+.para.open .zhbtn{opacity:1;color:var(--accent)}
+@media(hover:hover){.zhbtn:hover{background:var(--paper2);opacity:1}}
+
+.w{cursor:pointer;border-radius:3px;transition:color .15s,background .15s;padding:0 .04em;margin:0 -.04em}
+.w:active{background:var(--accent-soft)}
+.w.sec{color:var(--sec)}
+.w.key{color:var(--wtx)}
+.w.saved{background:var(--wsbg)}
+body.nomark .w.key{color:inherit}
+body.nosec .w.sec{color:inherit}
+
+.chnav{display:flex;gap:12px;margin:38px 0 0;border-top:1px solid var(--line);padding-top:20px}
+.chnav button{
+  flex:1;min-height:48px;border:1px solid var(--line);border-radius:12px;font-size:14px;
+  color:var(--muted);background:var(--card);
+}
+.chnav button:disabled{opacity:.35}
+.chnav button:active{background:var(--paper2)}
+
+/* ---------- tabbar ---------- */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:color-mix(in srgb,var(--paper) 92%,transparent);
+  backdrop-filter:saturate(150%) blur(14px);border-top:1px solid var(--line);
+}
+.tabbar button{
+  flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;font-size:11px;color:var(--muted);letter-spacing:.06em;
+}
+.tabbar button .ic{font-size:17px;line-height:1}
+.tabbar button.on{color:var(--accent)}
+
+/* ---------- scrim / sheet ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(20,14,6,.42);z-index:50;opacity:0;pointer-events:none;
+  transition:opacity .2s;backdrop-filter:blur(2px);
+}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:55;background:var(--card);
+  border-radius:18px 18px 0 0;box-shadow:var(--shadow);transform:translateY(104%);
+  transition:transform .24s cubic-bezier(.2,.8,.3,1);max-height:82vh;overflow:auto;
+  padding:8px 20px calc(22px + env(safe-area-inset-bottom));
+}
+.sheet.on{transform:translateY(0)}
+.grab{width:38px;height:4px;border-radius:3px;background:var(--line);margin:6px auto 12px}
+
+/* ---------- word card ---------- */
+.card-word{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-word h2{font-family:var(--serif);font-size:2em;margin:0;font-weight:600;letter-spacing:.01em}
+.card-word .ph{font-size:.82em;color:var(--muted);font-family:var(--serif)}
+.card-ch{font-size:11px;color:var(--muted);letter-spacing:.1em;margin:2px 0 12px}
+.card-tr{font-size:.95em;line-height:1.7;margin:0 0 14px}
+.card-block{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.card-lab{font-size:11px;letter-spacing:.12em;color:var(--muted);margin-bottom:5px}
+.card-sent{font-family:var(--serif);font-size:.92em;line-height:1.7;margin:0}
+.card-sent em{font-style:normal;background:var(--hl);border-radius:3px;padding:0 2px}
+.card-zh{font-size:.82em;color:var(--muted);margin:.5em 0 0;line-height:1.7}
+.card-actions{display:flex;gap:10px;margin-top:18px}
+.btn{
+  flex:1;min-height:48px;border-radius:12px;border:1px solid var(--line);font-size:14px;
+  background:var(--paper);color:var(--ink);
+}
+.btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+.btn:active{transform:scale(.99);opacity:.9}
+
+/* ---------- drawers ---------- */
+.drawer{
+  position:fixed;inset:0;z-index:56;display:flex;flex-direction:column;background:var(--paper);
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.3,1);
+}
+.drawer.on{transform:translateY(0)}
+.vnum{font-family:var(--sans);font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.02em;margin-left:9px}
+.drawer header{
+  display:flex;align-items:center;gap:12px;padding:calc(8px + env(safe-area-inset-top)) 16px 10px;
+  border-bottom:1px solid var(--line);
+}
+.drawer header h3{margin:0;font-size:15px;font-weight:600;flex:1}
+.drawer .list{overflow:auto;padding:8px 12px 40px;flex:1}
+.ci{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px}
+.ci:active{background:var(--paper2)}
+.ci .num{font-family:var(--serif);font-size:13px;color:var(--muted);width:26px;text-align:right}
+.ci .tx{flex:1;min-width:0}
+.ci .tx b{display:block;font-family:var(--serif);font-weight:600;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci .tx span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci.cur{background:var(--accent-soft)}
+.ci .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0}
+
+/* ---------- vocab rows ---------- */
+.vrow{display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--line)}
+.vrow b{font-family:var(--serif);font-size:16px;font-weight:600;min-width:96px}
+.vrow span{flex:1;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vrow button{width:40px;height:40px;color:var(--muted);font-size:16px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:60px 20px;line-height:1.9}
+
+/* ---------- settings ---------- */
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .lab{font-size:14px}
+.row .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{min-height:38px;padding:0 14px;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--accent);color:#fff}
+input[type=range]{width:150px;accent-color:var(--accent)}
+.switch{width:48px;height:28px;border-radius:16px;background:var(--line);position:relative;transition:.2s;flex:0 0 auto}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--accent)}
+.switch.on:after{left:23px}
+
+/* ---------- review ---------- */
+.review{position:fixed;inset:0;z-index:58;background:var(--paper);display:none;flex-direction:column}
+.review.on{display:flex}
+.review header{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 16px 8px;border-bottom:1px solid var(--line)}
+.review header .t{flex:1;font-size:13px;color:var(--muted)}
+.flipwrap{flex:1;display:grid;place-items:center;padding:24px}
+.flip{
+  width:min(86vw,460px);min-height:300px;border-radius:18px;background:var(--card);
+  box-shadow:var(--shadow);padding:34px 26px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;gap:10px;
+}
+.flip .w{font-family:var(--serif);font-size:2.4em;border:0;background:none;cursor:default}
+.flip .ph{color:var(--muted);font-family:var(--serif);font-size:.9em}
+.flip .tr{font-size:1.05em;line-height:1.7}
+.flip .hook{font-size:.82em;color:var(--muted);line-height:1.8}
+.flip .hint{font-size:11px;color:var(--muted);letter-spacing:.14em}
+.review footer{display:flex;gap:12px;padding:12px 18px calc(18px + env(safe-area-inset-bottom))}
+
+/* ---------- shelf ---------- */
+.bk{position:relative;display:flex;gap:14px;padding:12px;border-radius:14px;cursor:pointer}
+.bk:active{background:var(--paper2)}
+.bk.cur{background:var(--accent-soft)}
+.bk img{width:104px;height:69px;flex:0 0 104px;object-fit:cover;border-radius:10px;background:var(--paper2);pointer-events:none;-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
+.bk .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding-right:44px}
+.bk .tx b{font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.3}
+.bk .tx .en{font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.bk .tx .dsc{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bk .tx .p{font-size:11.5px;color:var(--accent);margin-top:6px;letter-spacing:.02em}
+.bk .curtag{position:absolute;right:12px;top:12px;font-style:normal;font-size:10.5px;letter-spacing:.08em;
+  padding:3px 9px;border-radius:999px;background:var(--accent);color:#fff}
+.volh{font-size:11px;letter-spacing:.16em;color:var(--muted);padding:18px 12px 6px;font-weight:500}
+
+/* ---------- desktop ---------- */
+@media(min-width:980px){
+  body{padding-bottom:0}
+  .topbar{padding-left:26px;padding-right:26px}
+  .wrap{padding:0 26px;gap:56px;align-items:flex-start}
+  .reader{max-width:38rem;padding-top:26px}
+  .hero{margin:0;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-s)}
+  .hero:after{display:none}
+  .side{
+    display:block;width:250px;flex:0 0 250px;position:sticky;top:78px;padding:26px 0;
+  }
+  .side h4{font-size:11px;letter-spacing:.16em;color:var(--muted);margin:0 0 10px;font-weight:500}
+  .side .ci{padding:8px 10px}
+  .side .ci .tx b{font-size:14px}
+  .tabbar{display:none}
+  .sheet{left:50%;right:auto;width:min(520px,92vw);transform:translate(-50%,104%);border-radius:18px 18px 0 0}
+  .sheet.on{transform:translate(-50%,0)}
+  .drawer{left:50%;right:auto;width:min(520px,92vw);transform:translate(-50%,100%)}
+  .drawer.on{transform:translate(-50%,0)}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="boot" id="boot">正在打开你的书…</div>
+<div id="bar"></div>
+
+<header class="topbar">
+  <button class="icon-btn" id="btnToc" aria-label="目录">目录</button>
+  <div class="crumb"><span id="crumbNo">01</span><b id="crumbTitle">图书馆的裂缝</b></div>
+  <button class="icon-btn" id="btnSet" aria-label="设置" style="font-family:var(--serif)">Aa</button>
+</header>
+
+<div class="wrap">
+  <aside class="side">
+    <h4>章 节</h4>
+    <div id="sideList"></div>
+    <h4 style="margin-top:26px">生 词</h4>
+    <div class="empty" id="sideVocab" style="padding:8px 10px;text-align:left">还没有收藏的单词</div>
+  </aside>
+
+  <article class="reader" id="reader">
+    <figure class="hero"><img id="hero" src="art/ch01.webp" alt="" loading="eager" decoding="async"></figure>
+    <div class="chhead">
+      <div class="chmeta" id="chMeta">CHAPTER 01</div>
+      <h1 id="chTitle">The Crack in the Library</h1>
+      <p class="cn" id="chCn">图书馆的裂缝</p>
+    </div>
+    <div class="chbody" id="chBody"></div>
+    <nav class="chnav">
+      <button id="prevCh">上一章</button>
+      <button id="nextCh">下一章</button>
+    </nav>
+  </article>
+</div>
+
+<nav class="tabbar">
+  <button id="tabShelf"><span class="ic">▤</span>书架</button>
+  <button id="tabVocab"><span class="ic">✎</span>生词</button>
+  <button id="tabReview"><span class="ic">↻</span>复习</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- word sheet -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div id="cardBody"></div>
+</div>
+
+<!-- toc drawer -->
+<div class="drawer" id="tocDrawer">
+  <header><h3>目录</h3><button class="icon-btn" data-close="tocDrawer">关</button></header>
+  <div class="list" id="tocList"></div>
+</div>
+
+<!-- shelf drawer -->
+<div class="drawer" id="shelfDrawer">
+  <header><h3>书架<span class="vnum" id="shelfNum">2 本</span></h3><button class="icon-btn" data-close="shelfDrawer">关</button></header>
+  <div class="list" id="shelfList"></div>
+</div>
+
+<!-- vocab drawer -->
+<div class="drawer" id="vocabDrawer">
+  <header><h3>生词本<span class="vnum" id="vNum">0 词</span></h3><button class="icon-btn" data-close="vocabDrawer">关</button></header>
+  <div class="list" id="vocabList"></div>
+</div>
+
+<!-- settings sheet -->
+<div class="sheet" id="setSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="row">
+    <div><div class="lab">字体大小</div><div class="sub" id="fsVal">100%</div></div>
+    <input type="range" id="fs" min="90" max="150" step="5" value="100">
+  </div>
+  <div class="row">
+    <div><div class="lab">主题</div></div>
+    <div class="seg" id="themeSeg">
+      <button data-theme="day" class="on">日间</button>
+      <button data-theme="sepia">护眼</button>
+      <button data-theme="night">夜间</button>
+    </div>
+  </div>
+  <div class="row">
+    <div><div class="lab">默认显示中文</div><div class="sub">每段也可单独点「中」</div></div>
+    <div class="switch" id="swZh"></div>
+  </div>
+  <div class="row">
+    <div><div class="lab">首行缩进</div><div class="sub">英文段落首行留白</div></div>
+    <div class="seg" id="indSeg">
+      <button data-ind="0">无</button>
+      <button data-ind="1.5" class="on">1.5 字</button>
+      <button data-ind="2">2 字</button>
+    </div>
+  </div>
+  <div class="row" id="rowSec">
+    <div><div class="lab">四级词汇标注</div><div class="sub">340 词之外的四级词，用更暗的字色轻标</div></div>
+    <div class="switch on" id="swSec"></div>
+  </div>
+  <div class="row" id="rowMark">
+    <div><div class="lab">340 词高亮</div><div class="sub">关掉后 340 词回到默认字色，收藏的词仍有底色</div></div>
+    <div class="switch on" id="swMark"></div>
+  </div>
+  <div class="row">
+    <div><div class="lab">重置阅读进度</div></div>
+    <button class="btn" id="btnReset" style="flex:0 0 auto;min-height:40px;padding:0 16px">重置</button>
+  </div>
+</div>
+
+<!-- review -->
+<div class="review" id="review">
+  <header>
+    <span class="t" id="revCount">0 / 0</span>
+    <button class="icon-btn" id="revClose">关</button>
+  </header>
+  <div class="flipwrap"><div class="flip" id="flip"></div></div>
+  <footer>
+    <button class="btn" id="revPrev">上一个</button>
+    <button class="btn primary" id="revNext">下一个</button>
+  </footer>
+</div>
+
+<script src="books/cet4.js"></script>
+<script src="books/manifest.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
