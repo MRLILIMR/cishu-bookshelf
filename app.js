@@ -175,7 +175,8 @@
     $('chBody').innerHTML = chapterHtml(c);
     if(!keepScroll){ window.scrollTo(0, 0); pos().y = 0; st.y = 0; }
     syncToc(); paintSaved(); paintSec(); save();
-    document.body.classList.add('ready');
+    if(/(^|\.)netlify\.app$/.test(location.hostname)) document.body.classList.add('nf');
+  document.body.classList.add('ready');
   }
 
   function tocHtml(){
