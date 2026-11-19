@@ -117,15 +117,16 @@ body.nosec .w.sec{color:inherit}
 .tabbar button .ic{font-size:17px;line-height:1}
 .tabbar button.on{color:var(--accent)}
 
-/* ---------- netlify badge guard (free plan injects a badge bottom-right) ---------- */
-body.nf .tabbar{
-  left:12px;right:12px;bottom:calc(60px + env(safe-area-inset-bottom));
-  border:1px solid var(--line);border-radius:16px;padding-bottom:0;
-  box-shadow:0 10px 26px rgba(0,0,0,.10);
+@media(max-width:979px){
+  body.nf .tabbar{
+    left:12px;right:12px;bottom:calc(60px + env(safe-area-inset-bottom));
+    border:1px solid var(--line);border-radius:16px;padding-bottom:0;
+    box-shadow:0 10px 26px rgba(0,0,0,.10);
+  }
+  body.nf .tabbar button{min-height:52px}
+  body.nf::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(60px + env(safe-area-inset-bottom));background:var(--paper);z-index:44}
+  body.nf #chBody{padding-bottom:110px}
 }
-body.nf .tabbar button{min-height:52px}
-body.nf::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(60px + env(safe-area-inset-bottom));background:var(--paper);z-index:44}
-body.nf #chBody{padding-bottom:110px}
 
 /* ---------- scrim / sheet ---------- */
 .scrim{
